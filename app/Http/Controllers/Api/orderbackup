@@ -1,0 +1,282 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class OrderController extends Controller
+{
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'workshop_id' => 'nullable|exists:workshops,id',
+            'mechanic_id' => 'nullable|exists:mechanics,id',
+            'problem' => 'nullable|string',
+            'user_lat' => 'required|numeric|between:-90,90',
+            'user_lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        if ($request->mechanic_id) {
+            $mechanic = DB::table('mechanics')
+                ->join('workshops', 'mechanics.workshop_id', '=', 'workshops.id')
+                ->where('mechanics.id', $request->mechanic_id)
+                ->select(
+                    'mechanics.id',
+                    'mechanics.status',
+                    'workshops.is_open'
+                )
+                ->first();
+
+            if (!$mechanic) {
+                return response()->json([
+                    'message' => 'Mekanik tidak ditemukan.',
+                ], 404);
+            }
+
+            if ($mechanic->status !== 'open') {
+                return response()->json([
+                    'message' => 'Mekanik sedang tidak tersedia.',
+                ], 422);
+            }
+
+            if (!$mechanic->is_open) {
+                return response()->json([
+                    'message' => 'Bengkel sedang tutup, mekanik tidak bisa diorder.',
+                ], 422);
+            }
+        }
+
+        $lat = (float) $request->user_lat;
+        $lng = (float) $request->user_lng;
+
+        // MENGGUNAKAN DB TRANSACTION AGAR PROSES MEMBUAT ORDER DAN CHAT ROOM BERJALAN SEKALIGUS
+        $orderId = DB::transaction(function () use ($request, $lng, $lat) {
+
+            // 1. Masukkan data ke tabel orders
+            $id = DB::table('orders')->insertGetId([
+                'order_code' => 'ORD-' . strtoupper(Str::random(8)),
+                'user_id' => $request->user_id,
+                'workshop_id' => $request->workshop_id,
+                'mechanic_id' => $request->mechanic_id,
+                'status' => 'pending',
+                'problem' => $request->problem,
+                'basic_cost' => 25000,
+                'total_cost' => 25000,
+                'eta' => null,
+                'user_location' => DB::raw("ST_SetSRID(ST_MakePoint($lng, $lat), 4326)::geography"),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 2. KUNCI UTAMA: Otomatis buat rumah chat di tabel chat_rooms memakai ID order yang baru terbentuk
+            DB::table('chat_rooms')->insert([
+                'id' => $id, // ID chat_room disamakan dengan ID order agar sinkron dan konsisten
+                'order_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return $id;
+        });
+
+        return response()->json([
+            'message' => 'Order berhasil dibuat',
+            'data' => DB::table('orders')->where('id', $orderId)->first(),
+        ], 201);
+    }
+
+    public function tracking($id)
+    {
+        $tracking = DB::table('orders')
+            ->join('users as customer_user', 'orders.user_id', '=', 'customer_user.id')
+            ->leftJoin('workshops', 'orders.workshop_id', '=', 'workshops.id')
+            ->leftJoin('mechanics', 'orders.mechanic_id', '=', 'mechanics.id')
+            ->leftJoin('users as mechanic_user', 'mechanics.user_id', '=', 'mechanic_user.id')
+            ->where('orders.id', $id)
+            ->selectRaw("
+                orders.id,
+                orders.order_code,
+                orders.status,
+                orders.problem,
+                orders.basic_cost,
+                orders.total_cost,
+                orders.eta,
+
+                customer_user.id AS user_id,
+                customer_user.name AS user_name,
+                customer_user.phone AS user_phone,
+                ST_Y(orders.user_location::geometry) AS user_latitude,
+                ST_X(orders.user_location::geometry) AS user_longitude,
+
+                workshops.id AS workshop_id,
+                workshops.name AS workshop_name,
+                workshops.address AS workshop_address,
+                workshops.is_open AS workshop_is_open,
+                ST_Y(workshops.geom::geometry) AS workshop_latitude,
+                ST_X(workshops.geom::geometry) AS workshop_longitude,
+
+                mechanics.id AS mechanic_id,
+
+                CASE
+                    WHEN workshops.is_open = false THEN 'close'
+                    ELSE mechanics.status
+                END AS mechanic_status,
+
+                mechanic_user.name AS mechanic_name,
+                mechanic_user.phone AS mechanic_phone,
+                mechanic_user.email AS mechanic_email,
+                ST_Y(mechanics.current_position::geometry) AS mechanic_latitude,
+                ST_X(mechanics.current_position::geometry) AS mechanic_longitude,
+
+                CASE
+                    WHEN mechanics.current_position IS NOT NULL THEN
+                        ROUND(
+                            (
+                                ST_Distance(
+                                    mechanics.current_position,
+                                    orders.user_location
+                                ) / 1000
+                            )::numeric,
+                            2
+                        )
+                    ELSE NULL
+                END AS mechanic_distance_km
+            ")
+            ->first();
+
+        if (!$tracking) {
+            return response()->json([
+                'message' => 'Order tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Data tracking berhasil diambil',
+            'data' => $tracking,
+        ]);
+    }
+    public function accept($id)
+    {
+        $order = DB::table('orders')
+            ->where('id', $id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order tidak ditemukan',
+            ], 404);
+        }
+
+        // Cek apakah masih ada order aktif
+        $activeOrder = DB::table('orders')
+            ->whereIn('status', [
+                'on_the_way',
+                'service'
+            ])
+            ->first();
+
+        if ($activeOrder) {
+            return response()->json([
+                'message' => 'Masih ada order yang sedang dikerjakan',
+            ], 422);
+        }
+
+        DB::table('orders')
+            ->where('id', $id)
+            ->update([
+                'status' => 'on_the_way',
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'message' => 'Order diterima, mekanik menuju lokasi',
+        ]);
+    }
+
+    public function arrive($id)
+    {
+        $order = DB::table('orders')
+            ->where('id', $id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order tidak ditemukan',
+            ], 404);
+        }
+
+        DB::table('orders')
+            ->where('id', $id)
+            ->update([
+                'status' => 'service',
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'message' => 'Mekanik tiba di lokasi dan servis dimulai',
+        ]);
+    }
+
+    public function complete($id)
+    {
+        $order = DB::table('orders')
+            ->where('id', $id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order tidak ditemukan',
+            ], 404);
+        }
+
+        DB::table('orders')
+            ->where('id', $id)
+            ->update([
+                'status' => 'completed',
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'message' => 'Servis selesai',
+        ]);
+    }
+    public function mechanicOrders()
+    {
+        $orders = DB::table('orders')
+            ->join('users', 'orders.user_id', '=', 'users.id')
+            ->leftJoin('mechanics', 'orders.mechanic_id', '=', 'mechanics.id')
+            ->whereIn('orders.status', [
+                'pending',
+                'on_the_way',
+                'service'
+            ])
+            ->select(
+                'orders.id',
+                'orders.order_code',
+                'orders.status',
+                'orders.problem',
+                'orders.basic_cost',
+                'orders.total_cost',
+                'orders.created_at',
+
+                'users.name as customer_name',
+                'users.phone as customer_phone',
+
+                DB::raw('ST_Y(orders.user_location::geometry) as user_latitude'),
+                DB::raw('ST_X(orders.user_location::geometry) as user_longitude'),
+
+                'mechanics.id as mechanic_id'
+            )
+            ->orderByDesc('orders.created_at')
+            ->get();
+
+        return response()->json([
+            'message' => 'Daftar order berhasil diambil',
+            'data' => $orders
+        ]);
+    }
+}
