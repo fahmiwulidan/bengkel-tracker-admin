@@ -20,10 +20,10 @@
 
 ## Ringkasan Proyek
 
-**Bengkel Tracker Admin & Backend API** adalah pusat kendali administrator dan penyedia layanan RESTful API untuk ekosistem aplikasi **Bengkel Tracker**[cite: 24]. Platform ini bertanggung jawab mengelola master data perbengkelan, jadwal dan penugasan mekanik, riwayat perbaikan kendaraan, pemantauan koordinat SIG/GIS, serta rekapitulasi laporan transaksi pembayaran.
+**Bengkel Tracker Admin & Backend API** adalah pusat kendali administrator dan penyedia layanan RESTful API untuk ekosistem aplikasi **Bengkel Tracker**. Platform ini bertanggung jawab mengelola master data perbengkelan, jadwal dan penugasan mekanik, riwayat perbaikan kendaraan, pemantauan koordinat SIG/GIS, serta rekapitulasi laporan transaksi pembayaran.
 
 > [!NOTE]
-> Aplikasi ini dikembangkan menggunakan framework **Laravel** dengan bundler **Vite** serta telah dilengkapi dengan konfigurasi **Docker** untuk mempermudah proses komputasi server dan penggelaran (*deployment*)[cite: 24, 25, 26].
+> Aplikasi ini dikembangkan menggunakan framework **Laravel** dengan bundler **Vite** serta telah dilengkapi dengan konfigurasi **Docker** untuk mempermudah proses komputasi server dan penggelaran (*deployment*).
 
 ---
 
@@ -31,18 +31,18 @@
 
 | Layer | Teknologi | Deskripsi |
 | :--- | :--- | :--- |
-| **Backend Framework** | Laravel (PHP) | Framework web utama pengolah logika bisnis & RESTful API service[cite: 25, 26] |
-| **Frontend Admin** | Blade Templating & Vite | Dashboard administrasi web interaktif dan teroptimasi[cite: 25, 26] |
-| **Containerization** | Docker & Docker Compose | Lingkungan isolasi aplikasi untuk kemudahan deployment[cite: 24, 25] |
-| **Database & ORM** | Eloquent ORM & MySQL | Pengelolaan data relasional transaksional dan pelacakan[cite: 24, 26] |
+| **Backend Framework** | Laravel (PHP) | Framework web utama pengolah logika bisnis & RESTful API service |
+| **Frontend Admin** | Blade Templating & Vite | Dashboard administrasi web interaktif dan teroptimasi |
+| **Containerization** | Docker & Docker Compose | Lingkungan isolasi aplikasi untuk kemudahan deployment |
+| **Database & ORM** | Eloquent ORM & MySQL | Pengelolaan data relasional transaksional dan pelacakan |
 
 ---
 
 ## Fitur Unggulan
 
-- **RESTful API Service** — Endpoint API terpusat untuk komunikasi data *real-time* dengan aplikasi *mobile* (`bengkel-tracker-app`)[cite: 24].
+- **RESTful API Service** — Endpoint API terpusat untuk komunikasi data *real-time* dengan aplikasi *mobile* (`bengkel-tracker-app`).
 - **Dashboard Manajemen Bengkel** — Panel kendali terpusat untuk pengelola dalam memantau operasional bengkel, daftar antrean servis, dan status mekanik.
-- **Dukungan Container Docker** — Dilengkapi berkas `Dockerfile`, `.dockerignore`, `entrypoint.sh`, dan `Procfile` untuk penyetelan kontainer server instan[cite: 25].
+- **Dukungan Container Docker** — Dilengkapi berkas `Dockerfile`, `.dockerignore`, `entrypoint.sh`, dan `Procfile` untuk penyetelan kontainer server instan.
 - **Manajemen Transaksi & Laporan** — Rekapitulasi pembayaran dan riwayat pengerjaan kendaraan secara akurat.
 
 ---
