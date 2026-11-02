@@ -1,66 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+  <h1>Bengkel Tracker Admin & Backend API</h1>
+  <p><b>Platform Backend & Panel Administrasi Manajemen Pelacakan Layanan Bengkel</b></p>
 
-## About Laravel
+  [![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+  [![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+  [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+  [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](./LICENSE)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+  <br />
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+  [Laporkan Bug](https://github.com/fahmiwulidan/bengkel-tracker-admin/issues) •
+  [Minta Fitur](https://github.com/fahmiwulidan/bengkel-tracker-admin/issues)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Ringkasan Proyek
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+**Bengkel Tracker Admin & Backend API** adalah pusat kendali administrator dan penyedia layanan RESTful API untuk ekosistem aplikasi **Bengkel Tracker**[cite: 24]. Platform ini bertanggung jawab mengelola master data perbengkelan, jadwal dan penugasan mekanik, riwayat perbaikan kendaraan, pemantauan koordinat SIG/GIS, serta rekapitulasi laporan transaksi pembayaran.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+> [!NOTE]
+> Aplikasi ini dikembangkan menggunakan framework **Laravel** dengan bundler **Vite** serta telah dilengkapi dengan konfigurasi **Docker** untuk mempermudah proses komputasi server dan penggelaran (*deployment*)[cite: 24, 25, 26].
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Teknologi Utama
 
-### Premium Partners
+| Layer | Teknologi | Deskripsi |
+| :--- | :--- | :--- |
+| **Backend Framework** | Laravel (PHP) | Framework web utama pengolah logika bisnis & RESTful API service[cite: 25, 26] |
+| **Frontend Admin** | Blade Templating & Vite | Dashboard administrasi web interaktif dan teroptimasi[cite: 25, 26] |
+| **Containerization** | Docker & Docker Compose | Lingkungan isolasi aplikasi untuk kemudahan deployment[cite: 24, 25] |
+| **Database & ORM** | Eloquent ORM & MySQL | Pengelolaan data relasional transaksional dan pelacakan[cite: 24, 26] |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## Fitur Unggulan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **RESTful API Service** — Endpoint API terpusat untuk komunikasi data *real-time* dengan aplikasi *mobile* (`bengkel-tracker-app`)[cite: 24].
+- **Dashboard Manajemen Bengkel** — Panel kendali terpusat untuk pengelola dalam memantau operasional bengkel, daftar antrean servis, dan status mekanik.
+- **Dukungan Container Docker** — Dilengkapi berkas `Dockerfile`, `.dockerignore`, `entrypoint.sh`, dan `Procfile` untuk penyetelan kontainer server instan[cite: 25].
+- **Manajemen Transaksi & Laporan** — Rekapitulasi pembayaran dan riwayat pengerjaan kendaraan secara akurat.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Struktur Direktori
 
-## Security Vulnerabilities
+```text
+bengkel-tracker-admin/
+├── api/              # Berkas & konfigurasi khusus REST API
+├── app/              # Core aplikasi Laravel (Controllers, Models, Middleware)
+├── bootstrap/        # Skrip inisialisasi framework & cache
+├── config/           # Berkas konfigurasi sistem (app, database, auth, dll)
+├── database/         # Migrasi, seeder, & pabrik data (factories)
+├── docker/           # Berkas konfigurasi tambahan untuk Docker environment
+├── public/           # Entry point aplikasi web (`index.php`) & aset publik
+├── resources/        # Tampilan Blade, komponen UI, & aset mentah (CSS/JS)
+├── routes/           # Penataan alur URL web (`web.php`) & API (`api.php`)
+├── storage/          # Penyimpanan log sistem, berkas unggahan, & cache
+├── tests/            # Pengujian otomatis (Unit & Feature Testing)
+├── Dockerfile        # Berkas instruksi pembuatan kontainer Docker
+├── Procfile          # Konfigurasi perintah eksekusi proses deployment
+├── entrypoint.sh     # Skrip shell pembuka layanan kontainer
+├── vite.config.js    # Konfigurasi bundler aset Vite
+└── README.md         # Dokumentasi utama repositori
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<div align="center">
+  <sub>Dikembangkan dengan ❤️ oleh <a href="https://github.com/fahmiwulidan">Fahmi Wulidan</a></sub>
+</div>
